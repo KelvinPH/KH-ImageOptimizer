@@ -2,19 +2,22 @@ import os
 from tkinter import Tk, Label, Button, Entry, filedialog, messagebox, StringVar, Radiobutton, Checkbutton, BooleanVar, IntVar, DISABLED, NORMAL, ttk
 from PIL import Image
 
+# Function to resize an individual image
 def resize_image(input_path, output_path, max_size):
-    """Resize the image to fit within max_size while maintaining aspect ratio, and save it."""
+    """Resize image to fit within max_size while maintaining aspect ratio, then save it."""
     with Image.open(input_path) as img:
-        img.thumbnail(max_size, Image.LANCZOS)
-        img.save(output_path, quality=85, optimize=True)
+        img.thumbnail(max_size, Image.LANCZOS)  # Resize image maintaining aspect ratio
+        img.save(output_path, quality=85, optimize=True)  # Save image with good quality
 
+# Function to resize images in a folder
 def resize_images_in_folder(input_folder, output_folder, max_size, replace=False, delete_input=False, rename=False, rename_text=""):
-    """Resize all images in the input folder and save them to the output folder."""
+    """Resize all images in the input folder and save to output folder based on provided settings."""
     if not os.path.exists(input_folder):
         messagebox.showerror("Input Error", f"Input folder '{input_folder}' does not exist.")
         return
+
     if not replace and not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+        os.makedirs(output_folder)  # Create output folder if it doesn't exist and we're not replacing
 
     files = [f for f in os.listdir(input_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))]
     total_files = len(files)
@@ -29,39 +32,40 @@ def resize_images_in_folder(input_folder, output_folder, max_size, replace=False
 
         if rename:
             base, ext = os.path.splitext(output_path)
-            output_path = base + rename_text + ext
+            output_path = base + rename_text + ext  # Add rename suffix
 
-        resize_image(input_path, output_path, max_size)
+        resize_image(input_path, output_path, max_size)  # Resize image
 
         if delete_input and not replace:
-            os.remove(input_path)
+            os.remove(input_path)  # Delete original file if needed
 
+        # Update progress bar and label
         progress_bar['value'] = idx + 1
         progress_label['text'] = f"Processing {idx + 1} of {total_files} images..."
         root.update_idletasks()
 
-    messagebox.showinfo("Success", "Images resized successfully!")
+    messagebox.showinfo("Success", "Images resized successfully!")  # Show success message
 
+# Function to open a dialog to select the input folder
 def select_input_folder():
-    """Open a dialog to select the input folder."""
     folder = filedialog.askdirectory()
     if folder:
         input_folder_entry.delete(0, 'end')
-        input_folder_entry.insert(0, folder)
+        input_folder_entry.insert(0, folder)  # Set selected folder in the input entry
 
+# Function to open a dialog to select the output folder
 def select_output_folder():
-    """Open a dialog to select the output folder."""
     folder = filedialog.askdirectory()
     if folder:
         output_folder_entry.delete(0, 'end')
-        output_folder_entry.insert(0, folder)
+        output_folder_entry.insert(0, folder)  # Set selected folder in the output entry
 
+# Function to return an optimal max size for web images
 def get_auto_size():
-    """Return an optimal maximum size for web images."""
-    return (1200, 1200)  # Example max size for web optimization
+    return (1200, 1200)  # Define default max size for web images
 
+# Function to start resizing process
 def start_resizing():
-    """Get folder paths and start resizing images."""
     input_folder = input_folder_entry.get()
     output_folder = output_folder_entry.get()
     auto_size = auto_size_var.get()
@@ -75,9 +79,9 @@ def start_resizing():
             if width and height:
                 max_size = (width, height)
             elif width:
-                max_size = (width, int(width * 1.5))  # Example ratio
+                max_size = (width, int(width * 1.5))  # Guess height based on width
             elif height:
-                max_size = (int(height * 1.5), height)  # Example ratio
+                max_size = (int(height * 1.5), height)  # Guess width based on height
             else:
                 messagebox.showerror("Input Error", "Width and height must be integers.")
                 return
@@ -92,8 +96,8 @@ def start_resizing():
 
     resize_images_in_folder(input_folder, output_folder, max_size, replace, delete_input, rename, rename_text)
 
+# Function to handle changes in replace/delete options
 def on_replace_delete_change():
-    """Enable or disable the output folder selection based on the replace option."""
     if replace_delete_var.get() == 'replace':
         output_folder_entry.config(state=DISABLED)
         output_folder_button.config(state=DISABLED)
@@ -101,8 +105,8 @@ def on_replace_delete_change():
         output_folder_entry.config(state=NORMAL)
         output_folder_button.config(state=NORMAL)
 
+# Function to handle changes in rename option
 def on_rename_change():
-    """Show or hide the rename entry based on the rename option."""
     if rename_var.get():
         rename_label.grid()
         rename_entry.grid()
@@ -110,14 +114,14 @@ def on_rename_change():
         rename_label.grid_remove()
         rename_entry.grid_remove()
 
-# Create the main window
+# Create main window
 root = Tk()
 root.title("Image Resizer")
 
 # Set window size
 root.geometry("800x600")
 
-# Create and place GUI elements
+# GUI elements
 Label(root, text="Input Folder:").grid(row=0, column=0, padx=10, pady=10, sticky='e')
 input_folder_entry = Entry(root, width=50)
 input_folder_entry.grid(row=0, column=1, padx=10, pady=10)
@@ -167,5 +171,5 @@ progress_label.grid(row=10, column=0, columnspan=3)
 progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
 progress_bar.grid(row=11, column=0, columnspan=3, pady=10)
 
-# Run the application
+# Run the app
 root.mainloop()
