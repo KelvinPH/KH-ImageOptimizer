@@ -1,7 +1,3 @@
-Sure! Here is the description in plain text for the README file:
-
----
-
 # KH ImageOptimizer
 
 **KH ImageOptimizer** is a user-friendly and efficient image resizing and optimization tool designed to simplify the process of reducing image file sizes while maintaining quality. This project features a graphical user interface (GUI) built with Tkinter, making it accessible for users of all skill levels.
